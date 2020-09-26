@@ -1,22 +1,22 @@
 package trabalhoRedesGA;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class SocketUtil {
 
-	public static void writeData(Socket socket, Object data) throws IOException {
-		ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
+	public static void writeData(ObjectOutputStream output, Object data) throws IOException {
 		output.flush();
 		output.writeObject(data);
 		output.flush();
-		output.close();
 	}
-	
-	public static Object readData(Socket socket) throws IOException, ClassNotFoundException {
-		ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
-		return (Object)input.readObject();
+
+	public static Object readData(ObjectInputStream input) throws IOException, ClassNotFoundException {
+        return (Object) input.readObject();
 	}
 }
