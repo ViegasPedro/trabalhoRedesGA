@@ -3,6 +3,8 @@ package trabalhoRedesGA;
 public enum Request {
 	
 	GET_RIDE, 
-	UPDATE_RIDE
+	CHECK_RIDE,
+	INSERT_RIDE,
+	FINISH_RIDE,
 	
 }

@@ -1,41 +1,52 @@
 package trabalhoRedesGA;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.Socket;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Driver {
 
-	public void requestRide(int id) {
+	public void startDriver(int driverId) {
 		new Thread() {
 			public void run() {
-				// for(int i = 0; i < 3; i++) {
 				try {
-					Socket socketCliente = new Socket("127.0.0.1", 6789);
-					System.out.println("START CLIENT");
-					ObjectOutputStream output = new ObjectOutputStream(socketCliente.getOutputStream());
-					ObjectInputStream input = new ObjectInputStream(socketCliente.getInputStream());
-
-					SocketUtil.writeData(output, Request.GET_RIDE);
-
-					Object serverResponse = SocketUtil.readData(input);
-					System.out.println(serverResponse);
-
-					SocketUtil.writeData(output, Request.UPDATE_RIDE);
-					System.out.println(SocketUtil.readData(input));
-
-					socketCliente.close();
-					System.out.println("FINISH CLIENT");
+					while(true) {
+						System.out.println("DRIVER INICIOU");
+						if(haveRide(driverId)) {
+							drive();
+							finishRide(driverId);
+						}
+						Thread.sleep(3000);
+					}
 				} catch (Exception e) {
-					// TODO: handle exception
+					System.out.println(e.getMessage());
+					e.printStackTrace();
 				}
-				// }
 			}
 		}.start();
+	}
+	
+	public boolean haveRide(int driverId) throws Exception{
+		Socket socketCliente = new Socket("127.0.0.1", 6789);
+		ObjectOutputStream output = new ObjectOutputStream(socketCliente.getOutputStream());
+		ObjectInputStream input = new ObjectInputStream(socketCliente.getInputStream());
+		SocketUtil.writeData(output, new RequestDTO(Request.GET_RIDE, 0, driverId));	
+		boolean serverResponse = (boolean)SocketUtil.readData(input);	
+		socketCliente.close();
+		return serverResponse;
+	}
+	
+	public void finishRide(int driverId) throws Exception{
+		Socket socketCliente = new Socket("127.0.0.1", 6789);
+		ObjectOutputStream output = new ObjectOutputStream(socketCliente.getOutputStream());
+		ObjectInputStream input = new ObjectInputStream(socketCliente.getInputStream());
+		SocketUtil.writeData(output, new RequestDTO(Request.FINISH_RIDE, 0, driverId));	
+		socketCliente.close();
+	}
+	
+	public void drive() throws InterruptedException {
+		int randomTime = ThreadLocalRandom.current().nextInt(5, 10+ 1);
+		Thread.sleep(randomTime*1000);
 	}
 }
